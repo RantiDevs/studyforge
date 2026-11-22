@@ -74,22 +74,22 @@ type Tab = "dashboard" | "courses" | "study" | "quiz" | "upload" | "timetable";
 
 const COURSES: Course[] = [
   // Harmattan
-  { id: "ABE501", title: "Engineering Management", credits: 3, semester: "harmattan", status: "R", color: "#6366f1", icon: "\u{1F4CA}" },
-  { id: "ABE573", title: "Engineer in Society", credits: 1, semester: "harmattan", status: "R", color: "#8b5cf6", icon: "\u{1F310}" },
-  { id: "MEE551", title: "Refrigeration and Airconditioning", credits: 3, semester: "harmattan", status: "R", color: "#06b6d4", icon: "\u{2744}\u{FE0F}" },
-  { id: "BME593", title: "Biomedical Engineering Project I", credits: 4, semester: "harmattan", status: "C", color: "#ec4899", icon: "\u{1F52C}" },
-  { id: "BME503", title: "Principle of Biomedical Eng. Instrumentation", credits: 3, semester: "harmattan", status: "E", color: "#f59e0b", icon: "\u{1F50C}" },
-  { id: "BME505", title: "Nanomedicine", credits: 3, semester: "harmattan", status: "E", color: "#10b981", icon: "\u{1F9EC}" },
+  { id: "ABE501", title: "Engineering Management", credits: 3, semester: "harmattan", status: "R", color: "#6366f1", icon: "📊" },
+  { id: "ABE573", title: "Engineer in Society", credits: 1, semester: "harmattan", status: "R", color: "#8b5cf6", icon: "🌐" },
+  { id: "MEE551", title: "Refrigeration and Airconditioning", credits: 3, semester: "harmattan", status: "R", color: "#06b6d4", icon: "❄️" },
+  { id: "BME593", title: "Biomedical Engineering Project I", credits: 4, semester: "harmattan", status: "C", color: "#ec4899", icon: "🔬" },
+  { id: "BME503", title: "Principle of Biomedical Eng. Instrumentation", credits: 3, semester: "harmattan", status: "E", color: "#f59e0b", icon: "🔌" },
+  { id: "BME505", title: "Nanomedicine", credits: 3, semester: "harmattan", status: "E", color: "#10b981", icon: "🧬" },
   // Rain
-  { id: "BUL506", title: "Engineering Law", credits: 3, semester: "rain", status: "R", color: "#64748b", icon: "\u{2696}\u{FE0F}" },
-  { id: "ELE506", title: "Reliability & Maintainability of Electrical Systems", credits: 3, semester: "rain", status: "R", color: "#f97316", icon: "\u{26A1}" },
-  { id: "BME502", title: "Biomedical Engineering Industries", credits: 3, semester: "rain", status: "C", color: "#14b8a6", icon: "\u{1F3ED}" },
-  { id: "BME504", title: "Models of the Neuron", credits: 3, semester: "rain", status: "C", color: "#a855f7", icon: "\u{1F9E0}" },
-  { id: "BME512", title: "Medical Imaging System", credits: 3, semester: "rain", status: "E", color: "#3b82f6", icon: "\u{1FA7B}" },
-  { id: "BME594", title: "Biomedical Engineering Project II", credits: 4, semester: "rain", status: "C", color: "#ec4899", icon: "\u{1F4DD}" },
-  { id: "BME216", title: "Human Physiology I", credits: 2, semester: "rain", status: "C", color: "#ef4444", icon: "\u{1FAC0}" },
-  { id: "BME334", title: "Biomedical Instrumentation", credits: 3, semester: "rain", status: "C", color: "#eab308", icon: "\u{1F3AF}" },
-  { id: "GET302", title: "Engineering Mathematics IV", credits: 3, semester: "rain", status: "R", color: "#6366f1", icon: "\u{1F4D0}" },
+  { id: "BUL506", title: "Engineering Law", credits: 3, semester: "rain", status: "R", color: "#64748b", icon: "⚖️" },
+  { id: "ELE506", title: "Reliability & Maintainability of Electrical Systems", credits: 3, semester: "rain", status: "R", color: "#f97316", icon: "⚡" },
+  { id: "BME502", title: "Biomedical Engineering Industries", credits: 3, semester: "rain", status: "C", color: "#14b8a6", icon: "🏭" },
+  { id: "BME504", title: "Models of the Neuron", credits: 3, semester: "rain", status: "C", color: "#a855f7", icon: "🧠" },
+  { id: "BME512", title: "Medical Imaging System", credits: 3, semester: "rain", status: "E", color: "#3b82f6", icon: "🩻" },
+  { id: "BME594", title: "Biomedical Engineering Project II", credits: 4, semester: "rain", status: "C", color: "#ec4899", icon: "📝" },
+  { id: "BME216", title: "Human Physiology I", credits: 2, semester: "rain", status: "C", color: "#ef4444", icon: "🫀" },
+  { id: "BME334", title: "Biomedical Instrumentation", credits: 3, semester: "rain", status: "C", color: "#eab308", icon: "🎯" },
+  { id: "GET302", title: "Engineering Mathematics IV", credits: 3, semester: "rain", status: "R", color: "#6366f1", icon: "📐" },
 ];
 
 /* ═══════════════════════════════════════════
@@ -373,15 +373,15 @@ function getDueCards(cards: Flashcard[]): Flashcard[] {
 
 const XP_VALUES = { lessonComplete: 50, quizCorrect: 20, quizPerfect: 100, flashcardReview: 10, streakBonus: 25 };
 const BADGES = [
-  { id: "first-lesson", name: "First Steps", desc: "Complete your first lesson", icon: "\u{1F476}", check: (p: Progress) => p.lessonsCompleted.length >= 1 },
-  { id: "five-lessons", name: "Scholar", desc: "Complete 5 lessons", icon: "\u{1F4DA}", check: (p: Progress) => p.lessonsCompleted.length >= 5 },
-  { id: "ten-lessons", name: "Knowledge Seeker", desc: "Complete 10 lessons", icon: "\u{1F393}", check: (p: Progress) => p.lessonsCompleted.length >= 10 },
-  { id: "first-quiz", name: "Quiz Taker", desc: "Complete your first quiz", icon: "\u{270D}\u{FE0F}", check: (p: Progress) => p.quizAttempts.length >= 1 },
-  { id: "perfect-quiz", name: "Perfect Score", desc: "Get 100% on a quiz", icon: "\u{1F31F}", check: (p: Progress) => { const byQ: Record<string, boolean[]> = {}; p.quizAttempts.forEach(a => { if (!byQ[a.questionId]) byQ[a.questionId] = []; byQ[a.questionId].push(a.correct); }); return Object.values(byQ).some(arr => arr.length > 0 && arr[arr.length - 1]); } },
-  { id: "streak-3", name: "On Fire", desc: "3-day study streak", icon: "\u{1F525}", check: (p: Progress) => p.streak >= 3 },
-  { id: "streak-7", name: "Unstoppable", desc: "7-day study streak", icon: "\u{1F4AA}", check: (p: Progress) => p.streak >= 7 },
-  { id: "xp-500", name: "Rising Star", desc: "Earn 500 XP", icon: "\u{2B50}", check: (p: Progress) => p.xp >= 500 },
-  { id: "xp-2000", name: "Powerhouse", desc: "Earn 2000 XP", icon: "\u{1F4A5}", check: (p: Progress) => p.xp >= 2000 },
+  { id: "first-lesson", name: "First Steps", desc: "Complete your first lesson", icon: "👶", check: (p: Progress) => p.lessonsCompleted.length >= 1 },
+  { id: "five-lessons", name: "Scholar", desc: "Complete 5 lessons", icon: "📚", check: (p: Progress) => p.lessonsCompleted.length >= 5 },
+  { id: "ten-lessons", name: "Knowledge Seeker", desc: "Complete 10 lessons", icon: "🎓", check: (p: Progress) => p.lessonsCompleted.length >= 10 },
+  { id: "first-quiz", name: "Quiz Taker", desc: "Complete your first quiz", icon: "✍️", check: (p: Progress) => p.quizAttempts.length >= 1 },
+  { id: "perfect-quiz", name: "Perfect Score", desc: "Get 100% on a quiz", icon: "🌟", check: (p: Progress) => { const byQ: Record<string, boolean[]> = {}; p.quizAttempts.forEach(a => { if (!byQ[a.questionId]) byQ[a.questionId] = []; byQ[a.questionId].push(a.correct); }); return Object.values(byQ).some(arr => arr.length > 0 && arr[arr.length - 1]); } },
+  { id: "streak-3", name: "On Fire", desc: "3-day study streak", icon: "🔥", check: (p: Progress) => p.streak >= 3 },
+  { id: "streak-7", name: "Unstoppable", desc: "7-day study streak", icon: "💪", check: (p: Progress) => p.streak >= 7 },
+  { id: "xp-500", name: "Rising Star", desc: "Earn 500 XP", icon: "⭐", check: (p: Progress) => p.xp >= 500 },
+  { id: "xp-2000", name: "Powerhouse", desc: "Earn 2000 XP", icon: "💥", check: (p: Progress) => p.xp >= 2000 },
 ];
 
 function calcLevel(xp: number): number {
@@ -401,7 +401,7 @@ function xpForNextLevel(xp: number): { current: number; needed: number } {
 function generateTimetable(semester: "harmattan" | "rain"): { day: string; slots: { time: string; courseId: string; activity: string }[] }[] {
   const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
   const semCourses = COURSES.filter(c => c.semester === semester);
-  const slots: { day: string; time: string; courseId: string; activity: string }[][] = days.map(() => []);
+  const slots: { time: string; courseId: string; activity: string }[][] = days.map(() => []);
   const times = ["08:00", "09:30", "11:00", "14:00", "15:30"];
   let slotIdx = 0;
   semCourses.forEach(course => {
@@ -436,11 +436,11 @@ function loadJSON<T>(key: string, fallback: T): T {
   try {
     const raw = localStorage.getItem(key);
     return raw ? JSON.parse(raw) : fallback;
-  } catch { return fallback; }
+  } catch (_e) { return fallback; }
 }
 
 function saveJSON(key: string, data: unknown) {
-  try { localStorage.setItem(key, JSON.stringify(data)); } catch {}
+  try { localStorage.setItem(key, JSON.stringify(data)); } catch (_e) { /* ignore */ }
 }
 
 const defaultProgress: Progress = {
@@ -555,7 +555,7 @@ export default function StudyForge() {
       {/* Badge Popup */}
       {newBadge && (
         <div className="fixed top-16 left-1/2 -translate-x-1/2 z-50 bg-bg-card border border-accent/50 text-white px-5 py-3 rounded-xl font-semibold anim-slide shadow-xl">
-          \u{1F3C6} Badge Unlocked: {newBadge}!
+          🏆 Badge Unlocked: {newBadge}!
         </div>
       )}
 
@@ -567,7 +567,7 @@ export default function StudyForge() {
         </div>
         <div className="flex items-center gap-3">
           <div className="text-sm font-semibold text-warn flex items-center gap-1">
-            {progress.streak > 0 && <><span className="text-base">\u{1F525}</span>{progress.streak}d</>}
+            {progress.streak > 0 && <><span className="text-base">🔥</span>{progress.streak}d</>}
           </div>
           <div className="bg-bg-card px-3 py-1 rounded-full text-sm font-semibold text-accent">
             Lv.{progress.level} · {progress.xp} XP
@@ -589,12 +589,12 @@ export default function StudyForge() {
       {/* Bottom Nav */}
       <nav className="fixed bottom-0 left-0 right-0 z-40 bg-bg-card/90 backdrop-blur-md border-t border-white/5 flex justify-around py-2 px-1 safe-bottom">
         {([
-          { key: "dashboard" as Tab, icon: "\u{1F3E0}", label: "Home" },
-          { key: "courses" as Tab, icon: "\u{1F4DA}", label: "Courses" },
-          { key: "study" as Tab, icon: "\u{1F4D6}", label: "Study" },
-          { key: "quiz" as Tab, icon: "\u{1F9E9}", label: "Quiz" },
-          { key: "upload" as Tab, icon: "\u{1F4E4}", label: "Upload" },
-          { key: "timetable" as Tab, icon: "\u{1F4C5}", label: "Schedule" },
+          { key: "dashboard" as Tab, icon: "🏠", label: "Home" },
+          { key: "courses" as Tab, icon: "📚", label: "Courses" },
+          { key: "study" as Tab, icon: "📖", label: "Study" },
+          { key: "quiz" as Tab, icon: "🧩", label: "Quiz" },
+          { key: "upload" as Tab, icon: "📤", label: "Upload" },
+          { key: "timetable" as Tab, icon: "📅", label: "Schedule" },
         ]).map(t => (
           <button key={t.key} onClick={() => { setTab(t.key); if (t.key === "courses") setSelectedCourse(null); if (t.key === "study" && !selectedCourse) setSelectedCourse(null); }} className={`flex flex-col items-center gap-0.5 px-2 py-1 rounded-lg transition-colors ${tab === t.key ? "text-accent" : "text-txt-dim hover:text-txt-muted"}`}>
             <span className="text-lg">{t.icon}</span>
@@ -659,7 +659,7 @@ function DashboardTab({ progress, allLessons, flashcards, onNavigate }: { progre
               <div className="text-warn font-semibold">{dueCards.length} flashcard{dueCards.length !== 1 ? "s" : ""} due for review</div>
               <div className="text-xs text-txt-muted mt-0.5">Spaced repetition keeps knowledge in long-term memory</div>
             </div>
-            <span className="text-2xl">\u{1F4AC}</span>
+            <span className="text-2xl">💬</span>
           </div>
         </button>
       )}
@@ -825,7 +825,7 @@ function CourseDetailTab({ courseId, lessons, quizzes, uploads, progress, onBack
             <div className="text-accent font-semibold">Take Quiz</div>
             <div className="text-xs text-txt-muted">{quizzes.length} questions available</div>
           </div>
-          <span className="text-2xl">\u{1F9E9}</span>
+          <span className="text-2xl">🧩</span>
         </button>
       )}
 
@@ -838,7 +838,7 @@ function CourseDetailTab({ courseId, lessons, quizzes, uploads, progress, onBack
           <div className="space-y-1.5">
             {uploads.map(u => (
               <div key={u.id} className="bg-bg-card rounded-lg p-3 border border-white/5 flex items-center gap-3">
-                <span className="text-lg">\u{1F4C4}</span>
+                <span className="text-lg">📄</span>
                 <div className="flex-1 min-w-0">
                   <div className="text-sm text-white truncate">{u.fileName}</div>
                   <div className="text-xs text-txt-dim">{new Date(u.uploadedAt).toLocaleDateString()}</div>
@@ -852,7 +852,7 @@ function CourseDetailTab({ courseId, lessons, quizzes, uploads, progress, onBack
 
       {lessons.length === 0 && quizzes.length === 0 && (
         <div className="bg-bg-card rounded-xl p-6 border border-white/5 text-center">
-          <div className="text-3xl mb-2">\u{1F4AD}</div>
+          <div className="text-3xl mb-2">💭</div>
           <div className="text-sm text-txt-muted">No content yet for this course. Upload your lecture PDFs, then ask Claude to generate lessons.</div>
         </div>
       )}
@@ -1018,7 +1018,7 @@ function QuizTab({ courseId, allQuizzes, flashcards, progress, onAnswer, onFlash
         {questions.length > 0 && (
           <button onClick={() => { setMode("quiz"); setCurrentQ(0); setScore(0); setSelected(null); setShowExplanation(false); }} className="w-full bg-bg-card rounded-xl p-5 border border-white/5 hover:bg-bg-hover transition-colors text-left">
             <div className="flex items-center gap-3">
-              <span className="text-3xl">\u{1F9E9}</span>
+              <span className="text-3xl">🧩</span>
               <div>
                 <div className="text-white font-semibold">Multiple Choice Quiz</div>
                 <div className="text-xs text-txt-muted">{questions.length} questions {courseId ? `for ${courseId}` : "across all courses"}</div>
@@ -1030,7 +1030,7 @@ function QuizTab({ courseId, allQuizzes, flashcards, progress, onAnswer, onFlash
         {/* Flashcard option */}
         <button onClick={() => { setMode("flashcard"); setCurrentCard(0); setFlipped(false); }} className={`w-full rounded-xl p-5 border text-left transition-colors ${dueCards.length > 0 ? "bg-warn/10 border-warn/30 hover:bg-warn/15" : "bg-bg-card border-white/5 hover:bg-bg-hover"}`}>
           <div className="flex items-center gap-3">
-            <span className="text-3xl">\u{1F4AC}</span>
+            <span className="text-3xl">💬</span>
             <div>
               <div className="text-white font-semibold">Flashcards</div>
               <div className="text-xs text-txt-muted">
@@ -1052,7 +1052,7 @@ function QuizTab({ courseId, allQuizzes, flashcards, progress, onAnswer, onFlash
       const pct = Math.round((score / questions.length) * 100);
       return (
         <div className="space-y-4 anim-slide text-center py-8">
-          <div className="text-5xl">{pct >= 80 ? "\u{1F31F}" : pct >= 50 ? "\u{1F44D}" : "\u{1F4AA}"}</div>
+          <div className="text-5xl">{pct >= 80 ? "🌟" : pct >= 50 ? "👍" : "💪"}</div>
           <h2 className="text-2xl font-bold text-white">Quiz Complete!</h2>
           <div className="text-4xl font-bold" style={{ color: pct >= 80 ? "#22c55e" : pct >= 50 ? "#f59e0b" : "#ef4444" }}>{pct}%</div>
           <p className="text-txt-muted">{score} of {questions.length} correct</p>
@@ -1128,7 +1128,7 @@ function QuizTab({ courseId, allQuizzes, flashcards, progress, onAnswer, onFlash
     if (currentCard >= cards.length) {
       return (
         <div className="text-center py-12 space-y-3 anim-slide">
-          <div className="text-4xl">\u{1F389}</div>
+          <div className="text-4xl">🎉</div>
           <h3 className="text-lg font-bold text-white">Review Complete!</h3>
           <p className="text-sm text-txt-muted">You reviewed {cards.length} card{cards.length !== 1 ? "s" : ""}</p>
           <button onClick={() => setMode("pick")} className="bg-accent text-white px-6 py-2.5 rounded-xl font-semibold mt-4">Done</button>
@@ -1255,12 +1255,12 @@ function UploadTab({ uploads, onUpload, onSelectCourse }: { uploads: Upload[]; o
         <input type="file" accept="application/pdf" multiple className="hidden" onChange={e => handleFiles(e.target.files)} disabled={uploading} />
         {uploading ? (
           <>
-            <div className="text-3xl mb-2 animate-spin">\u{23F3}</div>
+            <div className="text-3xl mb-2 animate-spin">⏳</div>
             <div className="text-sm text-accent">Uploading...</div>
           </>
         ) : (
           <>
-            <div className="text-3xl mb-2">\u{1F4E4}</div>
+            <div className="text-3xl mb-2">📤</div>
             <div className="text-sm text-white font-semibold">Tap to select PDFs</div>
             <div className="text-xs text-txt-dim mt-1">Multiple files supported</div>
           </>
@@ -1279,7 +1279,7 @@ function UploadTab({ uploads, onUpload, onSelectCourse }: { uploads: Upload[]; o
               const course = COURSES.find(c => c.id === u.courseId);
               return (
                 <div key={u.id} className="bg-bg-card rounded-lg p-3 border border-white/5 flex items-center gap-3">
-                  <span className="text-lg">\u{1F4C4}</span>
+                  <span className="text-lg">📄</span>
                   <div className="flex-1 min-w-0">
                     <div className="text-sm text-white truncate">{u.fileName}</div>
                     <div className="text-xs text-txt-dim">{course?.id} · {new Date(u.uploadedAt).toLocaleDateString()}</div>
