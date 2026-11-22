@@ -478,6 +478,27 @@ export default function StudyForge() {
   const [xpPopup, setXpPopup] = useState<number | null>(null);
   const [newBadge, setNewBadge] = useState<string | null>(null);
   const [loaded, setLoaded] = useState(false);
+  const [showDailyPlan, setShowDailyPlan] = useState(false);
+  const [notifStatus, setNotifStatus] = useState<"default" | "granted" | "denied">("default");
+
+  // Register service worker + check notification permission
+  useEffect(() => {
+    if ("serviceWorker" in navigator) {
+      navigator.serviceWorker.register("/sw.js").catch(() => {});
+    }
+    if ("Notification" in window) {
+      setNotifStatus(Notification.permission as "default" | "granted" | "denied");
+    }
+  }, []);
+
+  // Show daily plan on first open each day
+  useEffect(() => {
+    const today = new Date().toISOString().slice(0, 10);
+    const lastSeen = localStorage.getItem("sf_daily_plan_seen");
+    if (lastSeen !== today) {
+      setShowDailyPlan(true);
+    }
+  }, []);
 
   useEffect(() => {
     setProgress(loadJSON(STORAGE_KEYS.progress, defaultProgress));
@@ -505,6 +526,60 @@ export default function StudyForge() {
       return p;
     });
   }, [loaded]);
+
+  // Schedule notifications for today's study slots
+  const scheduleNotifications = useCallback(async () => {
+    if (!("Notification" in window)) return;
+    let perm = Notification.permission;
+    if (perm === "default") {
+      perm = await Notification.requestPermission();
+      setNotifStatus(perm as "default" | "granted" | "denied");
+    }
+    if (perm !== "granted") return;
+
+    // Determine current semester (Harmattan: Sep-Feb, Rain: Mar-Aug)
+    const month = new Date().getMonth();
+    const sem: "harmattan" | "rain" = (month >= 8 || month <= 1) ? "harmattan" : "rain";
+    const timetable = generateTimetable(sem);
+    const days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+    const todayName = days[new Date().getDay()];
+    const todayEntry = timetable.find(d => d.day === todayName);
+    if (!todayEntry || todayEntry.slots.length === 0) return;
+
+    const now = new Date();
+    todayEntry.slots.forEach(slot => {
+      const [h, m] = slot.time.split(":").map(Number);
+      const slotTime = new Date(now.getFullYear(), now.getMonth(), now.getDate(), h, m, 0);
+      const diff = slotTime.getTime() - now.getTime();
+      if (diff > 0 && diff < 24 * 60 * 60 * 1000) {
+        const course = COURSES.find(c => c.id === slot.courseId);
+        setTimeout(() => {
+          if ("serviceWorker" in navigator && navigator.serviceWorker.controller) {
+            navigator.serviceWorker.ready.then(reg => {
+              reg.showNotification("StudyForge", {
+                body: `${course?.icon || ""} ${slot.courseId}: ${slot.activity}`,
+                icon: "/icons/icon-192.png",
+                badge: "/icons/icon-192.png",
+                tag: `sf-${slot.time}-${slot.courseId}`,
+              });
+            });
+          } else {
+            new Notification("StudyForge", {
+              body: `${course?.icon || ""} ${slot.courseId}: ${slot.activity}`,
+              icon: "/icons/icon-192.png",
+            });
+          }
+        }, diff);
+      }
+    });
+  }, []);
+
+  // Auto-schedule on load if permission granted
+  useEffect(() => {
+    if (loaded && notifStatus === "granted") {
+      scheduleNotifications();
+    }
+  }, [loaded, notifStatus, scheduleNotifications]);
 
   const allLessons = useMemo(() => [...STARTER_LESSONS, ...customLessons], [customLessons]);
   const allQuizzes = useMemo(() => [...STARTER_QUIZZES, ...customQuizzes], [customQuizzes]);
@@ -561,8 +636,94 @@ export default function StudyForge() {
     );
   }
 
+  // Daily plan helpers
+  const dismissDailyPlan = () => {
+    localStorage.setItem("sf_daily_plan_seen", new Date().toISOString().slice(0, 10));
+    setShowDailyPlan(false);
+    if (notifStatus === "default") {
+      scheduleNotifications();
+    }
+  };
+
+  const todaySem: "harmattan" | "rain" = (() => {
+    const m = new Date().getMonth();
+    return (m >= 8 || m <= 1) ? "harmattan" : "rain";
+  })();
+  const todayTimetable = generateTimetable(todaySem);
+  const daysOfWeek = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+  const todayName = daysOfWeek[new Date().getDay()];
+  const todaySlots = todayTimetable.find(d => d.day === todayName)?.slots || [];
+  const dueCardsCount = getDueCards(flashcards).length;
+
   return (
     <div className="flex flex-col min-h-screen bg-bg pb-20 relative overflow-hidden">
+      {/* Daily Plan Overlay */}
+      {showDailyPlan && (
+        <div className="fixed inset-0 z-[60] bg-bg/95 backdrop-blur-xl flex items-center justify-center p-6">
+          <div className="max-w-sm w-full animate-slide-up space-y-5">
+            <div className="text-center">
+              <div className="text-4xl mb-3">{new Date().getHours() < 17 ? "☀️" : "🌙"}</div>
+              <h2 className="text-2xl font-bold text-gradient">Good {new Date().getHours() < 12 ? "morning" : new Date().getHours() < 17 ? "afternoon" : "evening"}, Meshack</h2>
+              <p className="text-xs text-txt-muted mt-1">{todayName}, {new Date().toLocaleDateString("en-NG", { day: "numeric", month: "long", year: "numeric" })}</p>
+            </div>
+
+            {/* Stats summary */}
+            <div className="grid grid-cols-3 gap-2">
+              <div className="card-3d rounded-xl p-3 text-center">
+                <div className="text-lg font-bold text-accent-light">{progress.streak}</div>
+                <div className="text-[9px] text-txt-dim">day streak</div>
+              </div>
+              <div className="card-3d rounded-xl p-3 text-center">
+                <div className="text-lg font-bold text-warn">{dueCardsCount}</div>
+                <div className="text-[9px] text-txt-dim">cards due</div>
+              </div>
+              <div className="card-3d rounded-xl p-3 text-center">
+                <div className="text-lg font-bold text-gold">Lv.{progress.level}</div>
+                <div className="text-[9px] text-txt-dim">{progress.xp} XP</div>
+              </div>
+            </div>
+
+            {/* Tonight's sessions */}
+            <div>
+              <h3 className="text-[10px] font-bold text-txt-dim uppercase tracking-widest mb-2">{todaySlots.length > 0 ? "Tonight's Sessions" : "Rest Day"}</h3>
+              {todaySlots.length > 0 ? (
+                <div className="space-y-1.5">
+                  {todaySlots.map((slot, i) => {
+                    const course = COURSES.find(c => c.id === slot.courseId);
+                    return (
+                      <div key={i} className="card-3d rounded-lg px-3 py-2.5 flex items-center gap-3">
+                        <span className="text-[11px] font-mono text-txt-dim w-11">{slot.time}</span>
+                        <div className="w-1 h-6 rounded-full" style={{ backgroundColor: course?.color }} />
+                        <div className="flex-1">
+                          <div className="text-sm text-white font-medium">{course?.icon} {course?.id}</div>
+                          <div className="text-[10px] text-txt-dim">{slot.activity}</div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              ) : (
+                <div className="card-3d rounded-xl p-4 text-center text-sm text-txt-dim">No sessions today. Recharge and come back strong.</div>
+              )}
+            </div>
+
+            {/* Notification prompt */}
+            {notifStatus === "default" && (
+              <div className="glass-accent rounded-xl p-3 border border-accent/20 text-center">
+                <div className="text-xs text-accent-light font-semibold">Enable notifications to get reminders for each session</div>
+              </div>
+            )}
+            {notifStatus === "granted" && (
+              <div className="text-center text-[10px] text-success">Notifications active for tonight&apos;s sessions</div>
+            )}
+
+            <button onClick={dismissDailyPlan} className="w-full btn-neon text-white font-semibold py-3.5 rounded-xl text-base">
+              {notifStatus === "default" ? "Enable Reminders & Start" : "Let's Go"}
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Background orbs */}
       <div className="orb w-72 h-72 bg-accent top-[-100px] left-[-80px]" />
       <div className="orb w-96 h-96 bg-cyber-DEFAULT bottom-[200px] right-[-120px]" />
