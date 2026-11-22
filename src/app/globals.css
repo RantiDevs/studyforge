@@ -1,0 +1,23 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+* { -webkit-tap-highlight-color: transparent; }
+html { scroll-behavior: smooth; }
+body { background: #0b0d13; color: #e2e8f0; }
+
+::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #334155; border-radius: 999px; }
+
+@keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes flipIn { from { transform: rotateY(90deg); } to { transform: rotateY(0deg); } }
+@keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.15); } }
+@keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes xpGain { 0% { opacity: 1; transform: translateY(0); } 100% { opacity: 0; transform: translateY(-30px); } }
+
+.anim-fade { animation: fadeIn 0.3s ease-out; }
+.anim-flip { animation: flipIn 0.4s ease-out; }
+.anim-pulse { animation: pulse 0.4s ease-out; }
+.anim-slide { animation: slideUp 0.35s ease-out; }
+.anim-xp { animation: xpGain 1.2s ease-out forwards; }
