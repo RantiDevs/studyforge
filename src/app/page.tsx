@@ -1,72 +1,14 @@
 "use client";
 import { useState, useEffect, useCallback, useMemo } from "react";
+import ImportPanel, { type ImportPayload } from "../components/ImportPanel";
+import ReadAloud from "../components/ReadAloud";
+import GamesTab from "../components/GamesTab";
+import type { Course, Lesson, QuizQuestion, Flashcard, Upload, Progress, Tab } from "../lib/types";
 
 /* ═══════════════════════════════════════════
    TYPES
    ═══════════════════════════════════════════ */
 
-interface Course {
-  id: string;
-  title: string;
-  credits: number;
-  semester: "harmattan" | "rain";
-  status: "C" | "R" | "E";
-  color: string;
-  icon: string;
-}
-
-interface Lesson {
-  id: string;
-  courseId: string;
-  title: string;
-  type: "prerequisite" | "module";
-  order: number;
-  content: string;
-  keyTerms: string[];
-  summary: string;
-}
-
-interface QuizQuestion {
-  id: string;
-  courseId: string;
-  question: string;
-  options: string[];
-  correctIndex: number;
-  explanation: string;
-}
-
-interface Flashcard {
-  id: string;
-  courseId: string;
-  front: string;
-  back: string;
-  interval: number;
-  easeFactor: number;
-  repetitions: number;
-  nextReview: string;
-}
-
-interface Upload {
-  id: string;
-  courseId: string;
-  fileName: string;
-  url: string;
-  uploadedAt: string;
-  contentGenerated: boolean;
-}
-
-interface Progress {
-  xp: number;
-  level: number;
-  streak: number;
-  lastStudyDate: string;
-  lessonsCompleted: string[];
-  quizAttempts: { questionId: string; correct: boolean; date: string }[];
-  badges: string[];
-  totalStudyMinutes: number;
-}
-
-type Tab = "dashboard" | "courses" | "study" | "quiz" | "upload" | "timetable";
 
 /* ═══════════════════════════════════════════
    COURSE DATA
@@ -459,6 +401,7 @@ const NAV_ICONS: Record<Tab, JSX.Element> = {
   study: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5"><path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2z"/><path d="M22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z"/></svg>,
   quiz: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>,
   upload: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>,
+  games: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5"><rect x="2" y="6" width="20" height="12" rx="4"/><line x1="7" y1="10" x2="7" y2="14"/><line x1="5" y1="12" x2="9" y2="12"/><circle cx="15" cy="11" r="1"/><circle cx="18" cy="13" r="1"/></svg>,
   timetable: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>,
 };
 
@@ -580,6 +523,12 @@ export default function StudyForge() {
       scheduleNotifications();
     }
   }, [loaded, notifStatus, scheduleNotifications]);
+
+  const handleImport = useCallback((p: ImportPayload) => {
+    setCustomLessons(prev => [...prev, ...p.lessons]);
+    setCustomQuizzes(prev => [...prev, ...p.quizzes]);
+    setFlashcards(prev => [...prev, ...p.flashcards]);
+  }, []);
 
   const allLessons = useMemo(() => [...STARTER_LESSONS, ...customLessons], [customLessons]);
   const allQuizzes = useMemo(() => [...STARTER_QUIZZES, ...customQuizzes], [customQuizzes]);
@@ -774,8 +723,9 @@ export default function StudyForge() {
         {tab === "courses" && selectedCourse && <CourseDetailTab courseId={selectedCourse} lessons={getLessonsForCourse(selectedCourse)} quizzes={getQuizzesForCourse(selectedCourse)} uploads={uploadsForCourse(selectedCourse)} progress={progress} onBack={() => setSelectedCourse(null)} onStudy={(id) => { setSelectedLesson(id); setTab("study"); }} onQuiz={() => setTab("quiz")} />}
         {tab === "study" && <StudyTab courseId={selectedCourse} lessonId={selectedLesson} allLessons={allLessons} progress={progress} onComplete={completeLesson} onBack={() => { setSelectedLesson(null); if (!selectedCourse) setTab("courses"); }} onSelectCourse={(id) => setSelectedCourse(id)} onSelectLesson={(id) => setSelectedLesson(id)} />}
         {tab === "quiz" && <QuizTab courseId={selectedCourse} allQuizzes={allQuizzes} flashcards={flashcards} progress={progress} onAnswer={(qId, correct) => { setProgress(p => ({ ...p, quizAttempts: [...p.quizAttempts, { questionId: qId, correct, date: new Date().toISOString() }] })); if (correct) addXP(XP_VALUES.quizCorrect); }} onFlashcardReview={(cardId, quality) => { setFlashcards(cards => cards.map(c => c.id === cardId ? sm2(c, quality) : c)); addXP(XP_VALUES.flashcardReview); }} onSelectCourse={(id) => setSelectedCourse(id)} onBack={() => { if (!selectedCourse) setTab("dashboard"); }} />}
-        {tab === "upload" && <UploadTab uploads={uploads} onUpload={(u) => setUploads(prev => [...prev, u])} onSelectCourse={(id) => setSelectedCourse(id)} />}
+        {tab === "upload" && <UploadTab onImport={handleImport} uploads={uploads} onUpload={(u) => setUploads(prev => [...prev, u])} onSelectCourse={(id) => setSelectedCourse(id)} />}
         {tab === "timetable" && <TimetableTab />}
+        {tab === "games" && <GamesTab flashcards={flashcards} quizzes={allQuizzes} onXP={addXP} />}
       </main>
 
       {/* Bottom Nav */}
@@ -786,6 +736,7 @@ export default function StudyForge() {
             { key: "courses" as Tab, label: "Courses" },
             { key: "study" as Tab, label: "Study" },
             { key: "quiz" as Tab, label: "Quiz" },
+            { key: "games" as Tab, label: "Games" },
             { key: "upload" as Tab, label: "Upload" },
             { key: "timetable" as Tab, label: "Schedule" },
           ]).map(t => {
@@ -1157,6 +1108,8 @@ function StudyTab({ courseId, lessonId, allLessons, progress, onComplete, onBack
         <h2 className="text-xl font-bold text-white mt-1">{lesson.title}</h2>
       </div>
 
+      <ReadAloud title={lesson.title} html={lesson.content} summary={lesson.summary} />
+
       {/* Lesson content */}
       <div className="card-3d rounded-2xl p-5 lesson-content" dangerouslySetInnerHTML={{ __html: lesson.content }} />
 
@@ -1421,7 +1374,7 @@ function QuizTab({ courseId, allQuizzes, flashcards, progress, onAnswer, onFlash
   return null;
 }
 
-function UploadTab({ uploads, onUpload, onSelectCourse }: { uploads: Upload[]; onUpload: (u: Upload) => void; onSelectCourse: (id: string) => void }) {
+function UploadTab({ uploads, onUpload, onSelectCourse, onImport }: { onImport: (p: ImportPayload) => void; uploads: Upload[]; onUpload: (u: Upload) => void; onSelectCourse: (id: string) => void }) {
   const [selectedCourseId, setSelectedCourseId] = useState(COURSES[0].id);
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState("");
@@ -1537,13 +1490,15 @@ function UploadTab({ uploads, onUpload, onSelectCourse }: { uploads: Upload[]; o
         </div>
       )}
 
+      <ImportPanel courseId={selectedCourseId} onImport={onImport} />
+
       <div className="glass-accent rounded-xl p-4">
         <div className="text-[10px] font-bold text-accent-light uppercase tracking-widest mb-2">How it works</div>
         <ol className="text-sm text-txt space-y-1.5 list-decimal list-inside">
           <li>Upload your lecture PDFs here</li>
           <li>Open a Claude chat on claude.ai</li>
           <li>Attach the same PDFs and say: &quot;Generate StudyForge lessons for {selectedCourseId}&quot;</li>
-          <li>Claude gives you a content file to import</li>
+          <li>Copy the prompt above, paste Claude&apos;s JSON reply into the box, and tap Import</li>
         </ol>
       </div>
     </div>
