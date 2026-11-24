@@ -1,4 +1,4 @@
-const CACHE_NAME = "studyforge-v2";
+const CACHE_NAME = "studyforge-v3";
 const ASSETS = ["/", "/manifest.json"];
 
 self.addEventListener("install", (e) => {
@@ -18,6 +18,20 @@ self.addEventListener("activate", (e) => {
 });
 
 self.addEventListener("fetch", (e) => {
+  if (e.request.method !== "GET") return; // never intercept uploads or other writes
+  if (e.request.mode === "navigate") {
+    // Network-first for pages so new deploys show immediately; cache is the offline fallback
+    e.respondWith(
+      fetch(e.request)
+        .then((res) => {
+          const clone = res.clone();
+          caches.open(CACHE_NAME).then((cache) => cache.put("/", clone));
+          return res;
+        })
+        .catch(() => caches.match("/"))
+    );
+    return;
+  }
   e.respondWith(
     caches.match(e.request).then((cached) => {
       const fetched = fetch(e.request)
