@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect, useCallback, useMemo } from "react";
 import ImportPanel, { type ImportPayload } from "../components/ImportPanel";
+import { isNativeApp, scheduleNativeReminders, type ReminderInput } from "../lib/nativeNotifications";
 import BackupPanel from "../components/BackupPanel";
 import ReadAloud from "../components/ReadAloud";
 import GamesTab from "../components/GamesTab";
@@ -473,6 +474,30 @@ export default function StudyForge() {
 
   // Schedule notifications for today's study slots
   const scheduleNotifications = useCallback(async () => {
+    // Inside the Android app: schedule the next 14 days natively so reminders fire even when the app is closed
+    if (isNativeApp()) {
+      const dayNames = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+      const reminders: ReminderInput[] = [];
+      for (let d = 0; d < 14; d++) {
+        const date = new Date();
+        date.setDate(date.getDate() + d);
+        const m = date.getMonth();
+        const semester: "harmattan" | "rain" = (m >= 8 || m <= 1) ? "harmattan" : "rain";
+        const entry = generateTimetable(semester).find(e => e.day === dayNames[date.getDay()]);
+        entry?.slots.forEach(slot => {
+          const [h, min] = slot.time.split(":").map(Number);
+          const course = COURSES.find(c => c.id === slot.courseId);
+          reminders.push({
+            at: new Date(date.getFullYear(), date.getMonth(), date.getDate(), h, min, 0),
+            title: "StudyForge",
+            body: `${course?.icon || ""} ${slot.courseId}: ${slot.activity}`,
+          });
+        });
+      }
+      const ok = await scheduleNativeReminders(reminders);
+      setNotifStatus(ok ? "granted" : "denied");
+      return;
+    }
     if (!("Notification" in window)) return;
     let perm = Notification.permission;
     if (perm === "default") {
