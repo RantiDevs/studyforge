@@ -1,0 +1,13 @@
+{
+  "appId": "com.rantidevs.studyforge",
+  "appName": "StudyForge",
+  "webDir": "www",
+  "server": {
+    "url": "https://studyforge-ruddy-seven.vercel.app",
+    "cleartext": false
+  },
+  "android": {
+    "allowMixedContent": false
+  },
+  "backgroundColor": "#06080f"
+}
