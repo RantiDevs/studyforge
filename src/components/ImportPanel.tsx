@@ -8,7 +8,7 @@ export interface ImportPayload {
   flashcards: Flashcard[];
 }
 
-const PROMPT = (courseId: string) => `Generate StudyForge content for ${courseId} from the attached material.
+const PROMPT = (courseId: string) => `Generate StudyForge content for ${courseId}. I will give the topics to cover as text below.
 Reply with ONLY one JSON object (no markdown fences) in this shape:
 {
   "lessons": [{ "title": "", "type": "prerequisite" | "module", "order": 0, "content": "<h2>..</h2><p>..</p> (HTML)", "keyTerms": ["..."], "summary": "" }],
@@ -65,7 +65,7 @@ export default function ImportPanel({ courseId, onImport }: { courseId: string; 
   const copyPrompt = async () => {
     try {
       await navigator.clipboard.writeText(PROMPT(courseId));
-      setMsg({ ok: true, text: "Prompt copied. Paste it into Claude with your PDFs attached." });
+      setMsg({ ok: true, text: "Prompt copied. Add your topics as text; your PDFs stay on Cloudinary." });
     } catch {
       setMsg({ ok: false, text: "Could not copy to clipboard." });
     }

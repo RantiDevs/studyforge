@@ -1026,7 +1026,7 @@ function CourseDetailTab({ courseId, lessons, quizzes, uploads, progress, onBack
       {lessons.length === 0 && quizzes.length === 0 && (
         <div className="card-3d rounded-xl p-6 text-center border-glow">
           <div className="text-3xl mb-2">💭</div>
-          <div className="text-sm text-txt-muted">No content yet. Upload your lecture PDFs, then ask Claude to generate lessons.</div>
+          <div className="text-sm text-txt-muted">No content yet. Import lessons from the Upload tab.</div>
         </div>
       )}
     </div>
@@ -1054,7 +1054,7 @@ function StudyTab({ courseId, lessonId, allLessons, progress, onComplete, onBack
             </button>
           ))}
           {coursesWithLessons.length === 0 && (
-            <div className="text-center text-txt-dim py-8 text-sm">No lessons available yet. Upload PDFs and ask Claude to generate lessons.</div>
+            <div className="text-center text-txt-dim py-8 text-sm">No lessons available yet. Import lessons from the Upload tab.</div>
           )}
         </div>
       </div>
@@ -1216,7 +1216,7 @@ function QuizTab({ courseId, allQuizzes, flashcards, progress, onAnswer, onFlash
         </button>
 
         {questions.length === 0 && flashcards.length === 0 && (
-          <div className="text-center py-8 text-txt-dim text-sm">No quizzes or flashcards available. Upload PDFs and ask Claude to generate them.</div>
+          <div className="text-center py-8 text-txt-dim text-sm">No quizzes or flashcards available. Import content from the Upload tab.</div>
         )}
       </div>
     );
@@ -1437,7 +1437,7 @@ function UploadTab({ uploads, onUpload, onSelectCourse, onImport }: { onImport: 
   return (
     <div className="space-y-4 animate-fade-in">
       <h2 className="text-xl font-bold text-gradient">Upload Materials</h2>
-      <p className="text-xs text-txt-muted">Upload your lecture PDFs. They go to Cloudinary, and you ask Claude to generate lessons from them.</p>
+      <p className="text-xs text-txt-muted">Your PDFs are uploaded to Cloudinary only. They are never sent anywhere else.</p>
 
       <div>
         <label className="text-[10px] text-txt-dim font-bold uppercase tracking-widest block mb-1.5">Course</label>
@@ -1498,10 +1498,9 @@ function UploadTab({ uploads, onUpload, onSelectCourse, onImport }: { onImport: 
       <div className="glass-accent rounded-xl p-4">
         <div className="text-[10px] font-bold text-accent-light uppercase tracking-widest mb-2">How it works</div>
         <ol className="text-sm text-txt space-y-1.5 list-decimal list-inside">
-          <li>Upload your lecture PDFs here</li>
-          <li>Open a Claude chat on claude.ai</li>
-          <li>Attach the same PDFs and say: &quot;Generate StudyForge lessons for {selectedCourseId}&quot;</li>
-          <li>Copy the prompt above, paste Claude&apos;s JSON reply into the box, and tap Import</li>
+          <li>Upload your lecture PDFs here. They are stored on Cloudinary only</li>
+          <li>Tap &quot;Copy prompt for Claude&quot; and paste it into a chat, adding the topics you want covered as text</li>
+          <li>Paste Claude&apos;s JSON reply into the box and tap Import</li>
         </ol>
       </div>
     </div>
