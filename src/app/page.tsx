@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect, useCallback, useMemo } from "react";
 import ImportPanel, { type ImportPayload } from "../components/ImportPanel";
+import BackupPanel from "../components/BackupPanel";
 import ReadAloud from "../components/ReadAloud";
 import GamesTab from "../components/GamesTab";
 import type { Course, Lesson, QuizQuestion, Flashcard, Upload, Progress, Tab } from "../lib/types";
@@ -1491,6 +1492,8 @@ function UploadTab({ uploads, onUpload, onSelectCourse, onImport }: { onImport: 
       )}
 
       <ImportPanel courseId={selectedCourseId} onImport={onImport} />
+
+      <BackupPanel />
 
       <div className="glass-accent rounded-xl p-4">
         <div className="text-[10px] font-bold text-accent-light uppercase tracking-widest mb-2">How it works</div>
