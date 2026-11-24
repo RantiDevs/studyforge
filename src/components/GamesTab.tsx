@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useMemo, useRef, useState } from "react";
-import type { Flashcard, QuizQuestion } from "../lib/types";
+import type { Flashcard, Lesson, QuizQuestion } from "../lib/types";
+import { BossBattle, TermHunt, TERM_RE } from "./ThemedGames";
 
 function shuffle<T>(arr: T[]): T[] {
   const a = [...arr];
@@ -11,13 +12,17 @@ function shuffle<T>(arr: T[]): T[] {
   return a;
 }
 
-type Game = "menu" | "match" | "speed";
+type Game = "menu" | "match" | "speed" | "boss" | "terms";
 
-export default function GamesTab({ flashcards, quizzes, onXP }: { flashcards: Flashcard[]; quizzes: QuizQuestion[]; onXP: (n: number) => void }) {
+export default function GamesTab({ flashcards, quizzes, lessons, onXP }: { flashcards: Flashcard[]; quizzes: QuizQuestion[]; lessons: Lesson[]; onXP: (n: number) => void }) {
   const [game, setGame] = useState<Game>("menu");
 
   if (game === "match") return <MatchGame cards={flashcards} onXP={onXP} onExit={() => setGame("menu")} />;
   if (game === "speed") return <SpeedQuiz questions={quizzes} onXP={onXP} onExit={() => setGame("menu")} />;
+  if (game === "boss") return <BossBattle questions={quizzes} onXP={onXP} onExit={() => setGame("menu")} />;
+  if (game === "terms") return <TermHunt lessons={lessons} onXP={onXP} onExit={() => setGame("menu")} />;
+
+  const termCount = lessons.reduce((n, l) => n + l.keyTerms.filter(t => TERM_RE.test(t)).length, 0);
 
   return (
     <div className="space-y-4 animate-fade-in">
@@ -30,6 +35,14 @@ export default function GamesTab({ flashcards, quizzes, onXP }: { flashcards: Fl
       <button onClick={() => setGame("speed")} disabled={quizzes.length < 3} className="w-full card-3d rounded-xl p-4 text-left disabled:opacity-40">
         <div className="text-sm font-semibold text-white">⚡ Speed Quiz</div>
         <div className="text-[11px] text-txt-dim">60 seconds. Answer as many as you can. Streaks multiply your score.{quizzes.length < 3 ? " Needs 3+ questions." : ""}</div>
+      </button>
+      <button onClick={() => setGame("boss")} disabled={quizzes.length < 5} className="w-full card-3d rounded-xl p-4 text-left disabled:opacity-40">
+        <div className="text-sm font-semibold text-white">🐉 Boss Battle</div>
+        <div className="text-[11px] text-txt-dim">Every right answer hurts the boss. Three wrong answers and you fall.{quizzes.length < 5 ? " Needs 5+ questions." : ""}</div>
+      </button>
+      <button onClick={() => setGame("terms")} disabled={termCount < 3} className="w-full card-3d rounded-xl p-4 text-left disabled:opacity-40">
+        <div className="text-sm font-semibold text-white">🔤 Term Hunt</div>
+        <div className="text-[11px] text-txt-dim">Guess the key term letter by letter from its lesson summary.{termCount < 3 ? " Needs lessons with key terms." : ""}</div>
       </button>
     </div>
   );

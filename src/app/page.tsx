@@ -726,7 +726,7 @@ export default function StudyForge() {
         {tab === "quiz" && <QuizTab courseId={selectedCourse} allQuizzes={allQuizzes} flashcards={flashcards} progress={progress} onAnswer={(qId, correct) => { setProgress(p => ({ ...p, quizAttempts: [...p.quizAttempts, { questionId: qId, correct, date: new Date().toISOString() }] })); if (correct) addXP(XP_VALUES.quizCorrect); }} onFlashcardReview={(cardId, quality) => { setFlashcards(cards => cards.map(c => c.id === cardId ? sm2(c, quality) : c)); addXP(XP_VALUES.flashcardReview); }} onSelectCourse={(id) => setSelectedCourse(id)} onBack={() => { if (!selectedCourse) setTab("dashboard"); }} />}
         {tab === "upload" && <UploadTab onImport={handleImport} uploads={uploads} onUpload={(u) => setUploads(prev => [...prev, u])} onSelectCourse={(id) => setSelectedCourse(id)} />}
         {tab === "timetable" && <TimetableTab />}
-        {tab === "games" && <GamesTab flashcards={flashcards} quizzes={allQuizzes} onXP={addXP} />}
+        {tab === "games" && <GamesTab flashcards={flashcards} quizzes={allQuizzes} lessons={allLessons} onXP={addXP} />}
       </main>
 
       {/* Bottom Nav */}
