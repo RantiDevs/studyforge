@@ -2,7 +2,8 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { Flashcard, Lesson, QuizQuestion } from "../lib/types";
 import { BossBattle, TermHunt, TERM_RE } from "./ThemedGames";
-import StoryGame from "./story/StoryGame";
+import StoryLessons from "./story/StoryLessons";
+import { getScript } from "../data/scripts";
 import { getStory } from "../data/stories";
 
 export interface JourneyCourse { id: string; title: string; icon: string; color: string }
@@ -38,7 +39,7 @@ export default function GamesTab({ courses, flashcards: allCards, quizzes: allQu
   const quizzes = useMemo(() => allQuizzes.filter(q => q.courseId === courseId), [allQuizzes, courseId]);
   const flashcards = useMemo(() => allCards.filter(c => c.courseId === courseId), [allCards, courseId]);
 
-  if (game === "journey" && course) return <StoryGame courseId={course.id} theme={getStory(course.id)} lessons={lessons} quizzes={quizzes} flashcards={flashcards} onXP={onXP} onExit={() => setGame("menu")} />;
+  if (game === "journey" && course) return <StoryLessons courseId={course.id} theme={getStory(course.id)} script={getScript(course.id)} lessons={lessons} quizzes={quizzes} flashcards={flashcards} onXP={onXP} onExit={() => setGame("menu")} />;
   if (game === "match") return <MatchGame cards={flashcards} onXP={onXP} onExit={() => setGame("menu")} />;
   if (game === "speed") return <SpeedQuiz questions={quizzes} onXP={onXP} onExit={() => setGame("menu")} />;
   if (game === "boss") return <BossBattle questions={quizzes} onXP={onXP} onExit={() => setGame("menu")} />;
