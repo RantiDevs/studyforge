@@ -2,6 +2,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { Flashcard, Lesson, QuizQuestion } from "../lib/types";
 import { BossBattle, TermHunt, TERM_RE } from "./ThemedGames";
+import CourseJourney, { type JourneyCourse } from "./CourseJourney";
 
 function shuffle<T>(arr: T[]): T[] {
   const a = [...arr];
@@ -12,11 +13,29 @@ function shuffle<T>(arr: T[]): T[] {
   return a;
 }
 
-type Game = "menu" | "match" | "speed" | "boss" | "terms";
+type Game = "menu" | "journey" | "match" | "speed" | "boss" | "terms";
+const COURSE_KEY = "sf_games_course";
 
-export default function GamesTab({ flashcards, quizzes, lessons, onXP }: { flashcards: Flashcard[]; quizzes: QuizQuestion[]; lessons: Lesson[]; onXP: (n: number) => void }) {
+export default function GamesTab({ courses, flashcards: allCards, quizzes: allQuizzes, lessons: allLessons, onXP }: {
+  courses: JourneyCourse[]; flashcards: Flashcard[]; quizzes: QuizQuestion[]; lessons: Lesson[]; onXP: (n: number) => void;
+}) {
   const [game, setGame] = useState<Game>("menu");
+  const playable = useMemo(() => courses.filter(c => allLessons.some(l => l.courseId === c.id)), [courses, allLessons]);
+  const [courseId, setCourseId] = useState("");
 
+  useEffect(() => {
+    let saved = "";
+    try { saved = localStorage.getItem(COURSE_KEY) || ""; } catch { /* ignore */ }
+    setCourseId(playable.some(c => c.id === saved) ? saved : playable[0]?.id || "");
+  }, [playable]);
+  const chooseCourse = (id: string) => { setCourseId(id); try { localStorage.setItem(COURSE_KEY, id); } catch { /* ignore */ } };
+
+  const course = playable.find(c => c.id === courseId);
+  const lessons = useMemo(() => allLessons.filter(l => l.courseId === courseId), [allLessons, courseId]);
+  const quizzes = useMemo(() => allQuizzes.filter(q => q.courseId === courseId), [allQuizzes, courseId]);
+  const flashcards = useMemo(() => allCards.filter(c => c.courseId === courseId), [allCards, courseId]);
+
+  if (game === "journey" && course) return <CourseJourney course={course} lessons={lessons} quizzes={quizzes} flashcards={flashcards} onXP={onXP} onExit={() => setGame("menu")} />;
   if (game === "match") return <MatchGame cards={flashcards} onXP={onXP} onExit={() => setGame("menu")} />;
   if (game === "speed") return <SpeedQuiz questions={quizzes} onXP={onXP} onExit={() => setGame("menu")} />;
   if (game === "boss") return <BossBattle questions={quizzes} onXP={onXP} onExit={() => setGame("menu")} />;
@@ -24,10 +43,26 @@ export default function GamesTab({ flashcards, quizzes, lessons, onXP }: { flash
 
   const termCount = lessons.reduce((n, l) => n + l.keyTerms.filter(t => TERM_RE.test(t)).length, 0);
 
+  if (!playable.length) {
+    return (
+      <div className="space-y-4 animate-fade-in">
+        <h2 className="text-xl font-bold text-gradient">Games</h2>
+        <div className="card-3d rounded-xl p-5 text-center text-sm text-txt-dim">Games unlock once a course has lessons.</div>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-4 animate-fade-in">
       <h2 className="text-xl font-bold text-gradient">Games</h2>
-      <p className="text-xs text-txt-muted">Learn by playing. Every game earns XP.</p>
+      <select value={courseId} onChange={e => chooseCourse(e.target.value)} className="w-full glass border border-white/10 rounded-xl px-4 py-3 text-sm text-white bg-bg-card focus:outline-none focus:border-accent/50">
+        {playable.map(c => <option key={c.id} value={c.id}>{c.icon} {c.id}: {c.title}</option>)}
+      </select>
+      <button onClick={() => setGame("journey")} disabled={!course} className="w-full rounded-xl p-4 text-left border border-accent/40 bg-accent/10 disabled:opacity-40">
+        <div className="text-sm font-bold text-white">🗺️ Course Journey</div>
+        <div className="text-[11px] text-txt-dim">Study the course from start to finish, topic by topic, in course-outline order. Clear each level to unlock the next.</div>
+      </button>
+      <p className="text-[10px] font-bold text-txt-dim uppercase tracking-widest pt-1">Practice games for {courseId}</p>
       <button onClick={() => setGame("match")} disabled={flashcards.length < 4} className="w-full card-3d rounded-xl p-4 text-left disabled:opacity-40">
         <div className="text-sm font-semibold text-white">🧩 Match Up</div>
         <div className="text-[11px] text-txt-dim">Pair each term with its definition. Fewer moves, more XP.{flashcards.length < 4 ? " Needs 4+ flashcards." : ""}</div>

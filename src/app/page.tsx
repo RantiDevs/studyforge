@@ -2,6 +2,7 @@
 import { useState, useEffect, useCallback, useMemo } from "react";
 import ImportPanel, { type ImportPayload } from "../components/ImportPanel";
 import { isNativeApp, scheduleNativeReminders, type ReminderInput } from "../lib/nativeNotifications";
+import { MATERIAL_COURSE_IDS, MATERIAL_LESSONS, MATERIAL_QUIZZES, MATERIAL_FLASHCARDS } from "../data/courses";
 import BackupPanel from "../components/BackupPanel";
 import ReadAloud from "../components/ReadAloud";
 import GamesTab from "../components/GamesTab";
@@ -447,7 +448,12 @@ export default function StudyForge() {
 
   useEffect(() => {
     setProgress(loadJSON(STORAGE_KEYS.progress, defaultProgress));
-    setFlashcards(loadJSON(STORAGE_KEYS.flashcards, STARTER_FLASHCARDS));
+    {
+      // Keep saved review progress; drop placeholder cards for courses now built from real materials; add any new cards.
+      const saved = loadJSON<Flashcard[]>(STORAGE_KEYS.flashcards, []).filter(c => !(MATERIAL_COURSE_IDS.has(c.courseId) && STARTER_FLASHCARDS.some(sc => sc.id === c.id)));
+      const ids = new Set(saved.map(c => c.id));
+      setFlashcards([...saved, ...[...STARTER_FLASHCARDS.filter(c => !MATERIAL_COURSE_IDS.has(c.courseId)), ...MATERIAL_FLASHCARDS].filter(c => !ids.has(c.id))]);
+    }
     setUploads(loadJSON(STORAGE_KEYS.uploads, []));
     setCustomLessons(loadJSON(STORAGE_KEYS.customLessons, []));
     setCustomQuizzes(loadJSON(STORAGE_KEYS.customQuizzes, []));
@@ -556,8 +562,8 @@ export default function StudyForge() {
     setFlashcards(prev => [...prev, ...p.flashcards]);
   }, []);
 
-  const allLessons = useMemo(() => [...STARTER_LESSONS, ...customLessons], [customLessons]);
-  const allQuizzes = useMemo(() => [...STARTER_QUIZZES, ...customQuizzes], [customQuizzes]);
+  const allLessons = useMemo(() => [...STARTER_LESSONS.filter(l => !MATERIAL_COURSE_IDS.has(l.courseId)), ...MATERIAL_LESSONS, ...customLessons], [customLessons]);
+  const allQuizzes = useMemo(() => [...STARTER_QUIZZES.filter(q => !MATERIAL_COURSE_IDS.has(q.courseId)), ...MATERIAL_QUIZZES, ...customQuizzes], [customQuizzes]);
 
   const addXP = useCallback((amount: number) => {
     setXpPopup(amount);
@@ -751,7 +757,7 @@ export default function StudyForge() {
         {tab === "quiz" && <QuizTab courseId={selectedCourse} allQuizzes={allQuizzes} flashcards={flashcards} progress={progress} onAnswer={(qId, correct) => { setProgress(p => ({ ...p, quizAttempts: [...p.quizAttempts, { questionId: qId, correct, date: new Date().toISOString() }] })); if (correct) addXP(XP_VALUES.quizCorrect); }} onFlashcardReview={(cardId, quality) => { setFlashcards(cards => cards.map(c => c.id === cardId ? sm2(c, quality) : c)); addXP(XP_VALUES.flashcardReview); }} onSelectCourse={(id) => setSelectedCourse(id)} onBack={() => { if (!selectedCourse) setTab("dashboard"); }} />}
         {tab === "upload" && <UploadTab onImport={handleImport} uploads={uploads} onUpload={(u) => setUploads(prev => [...prev, u])} onSelectCourse={(id) => setSelectedCourse(id)} />}
         {tab === "timetable" && <TimetableTab />}
-        {tab === "games" && <GamesTab flashcards={flashcards} quizzes={allQuizzes} lessons={allLessons} onXP={addXP} />}
+        {tab === "games" && <GamesTab courses={COURSES} flashcards={flashcards} quizzes={allQuizzes} lessons={allLessons} onXP={addXP} />}
       </main>
 
       {/* Bottom Nav */}

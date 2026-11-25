@@ -27,6 +27,7 @@ export interface QuizQuestion {
   options: string[];
   correctIndex: number;
   explanation: string;
+  lessonId?: string;
 }
 
 export interface Flashcard {
@@ -38,6 +39,7 @@ export interface Flashcard {
   easeFactor: number;
   repetitions: number;
   nextReview: string;
+  lessonId?: string;
 }
 
 export interface Upload {
