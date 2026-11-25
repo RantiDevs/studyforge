@@ -2,7 +2,10 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { Flashcard, Lesson, QuizQuestion } from "../lib/types";
 import { BossBattle, TermHunt, TERM_RE } from "./ThemedGames";
-import CourseJourney, { type JourneyCourse } from "./CourseJourney";
+import StoryGame from "./story/StoryGame";
+import { getStory } from "../data/stories";
+
+export interface JourneyCourse { id: string; title: string; icon: string; color: string }
 
 function shuffle<T>(arr: T[]): T[] {
   const a = [...arr];
@@ -35,7 +38,7 @@ export default function GamesTab({ courses, flashcards: allCards, quizzes: allQu
   const quizzes = useMemo(() => allQuizzes.filter(q => q.courseId === courseId), [allQuizzes, courseId]);
   const flashcards = useMemo(() => allCards.filter(c => c.courseId === courseId), [allCards, courseId]);
 
-  if (game === "journey" && course) return <CourseJourney course={course} lessons={lessons} quizzes={quizzes} flashcards={flashcards} onXP={onXP} onExit={() => setGame("menu")} />;
+  if (game === "journey" && course) return <StoryGame courseId={course.id} theme={getStory(course.id)} lessons={lessons} quizzes={quizzes} flashcards={flashcards} onXP={onXP} onExit={() => setGame("menu")} />;
   if (game === "match") return <MatchGame cards={flashcards} onXP={onXP} onExit={() => setGame("menu")} />;
   if (game === "speed") return <SpeedQuiz questions={quizzes} onXP={onXP} onExit={() => setGame("menu")} />;
   if (game === "boss") return <BossBattle questions={quizzes} onXP={onXP} onExit={() => setGame("menu")} />;
@@ -58,9 +61,11 @@ export default function GamesTab({ courses, flashcards: allCards, quizzes: allQu
       <select value={courseId} onChange={e => chooseCourse(e.target.value)} className="w-full glass border border-white/10 rounded-xl px-4 py-3 text-sm text-white bg-bg-card focus:outline-none focus:border-accent/50">
         {playable.map(c => <option key={c.id} value={c.id}>{c.icon} {c.id}: {c.title}</option>)}
       </select>
-      <button onClick={() => setGame("journey")} disabled={!course} className="w-full rounded-xl p-4 text-left border border-accent/40 bg-accent/10 disabled:opacity-40">
-        <div className="text-sm font-bold text-white">🗺️ Course Journey</div>
-        <div className="text-[11px] text-txt-dim">Study the course from start to finish, topic by topic, in course-outline order. Clear each level to unlock the next.</div>
+      <button onClick={() => setGame("journey")} disabled={!course} className="w-full rounded-2xl p-4 text-left border border-accent/40 bg-gradient-to-br from-accent/20 to-cyber-DEFAULT/10 disabled:opacity-40">
+        <div className="text-[10px] uppercase tracking-widest text-accent-light font-bold">Story mode</div>
+        <div className="text-base font-bold text-white mt-0.5">{getStory(courseId).player} {getStory(courseId).title}</div>
+        <div className="text-[11px] text-txt-dim mt-1">{getStory(courseId).premise}</div>
+        <div className="text-[11px] text-accent-light mt-2 font-semibold">Play the whole course as a story, chapter by chapter →</div>
       </button>
       <p className="text-[10px] font-bold text-txt-dim uppercase tracking-widest pt-1">Practice games for {courseId}</p>
       <button onClick={() => setGame("match")} disabled={flashcards.length < 4} className="w-full card-3d rounded-xl p-4 text-left disabled:opacity-40">

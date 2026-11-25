@@ -17,7 +17,7 @@ function Exit({ onExit }: { onExit: () => void }) {
   return <button onClick={onExit} className="text-xs text-accent-light font-medium">← Games</button>;
 }
 
-export function BossBattle({ questions, onXP, onExit }: { questions: QuizQuestion[]; onXP: (n: number) => void; onExit: () => void }) {
+export function BossBattle({ questions, onXP, onExit, bossName = "Boss", bossEmoji = "🐉" }: { questions: QuizQuestion[]; onXP: (n: number) => void; onExit: () => void; bossName?: string; bossEmoji?: string }) {
   const BOSS_HP = 8;
   const [round, setRound] = useState(0);
   const queue = useMemo(() => shuffle(questions), [questions, round]); // eslint-disable-line react-hooks/exhaustive-deps
@@ -46,14 +46,14 @@ export function BossBattle({ questions, onXP, onExit }: { questions: QuizQuestio
     <div className="space-y-4 animate-fade-in">
       <Exit onExit={onExit} />
       <div className="card-3d rounded-2xl p-4 space-y-2">
-        <div className="flex justify-between text-sm"><span className="text-white font-bold">🐉 Boss</span><span className="text-danger font-bold">{Math.max(bossHp, 0)}/{BOSS_HP}</span></div>
+        <div className="flex justify-between text-sm"><span className="text-white font-bold">{bossEmoji} {bossName}</span><span className="text-danger font-bold">{Math.max(bossHp, 0)}/{BOSS_HP}</span></div>
         <div className="h-2 rounded-full bg-white/10 overflow-hidden"><div className="h-full bg-danger transition-all" style={{ width: `${(Math.max(bossHp, 0) / BOSS_HP) * 100}%` }} /></div>
         <div className="text-right text-sm">{"❤️".repeat(Math.max(lives, 0))}{"🖤".repeat(3 - Math.max(lives, 0))}</div>
       </div>
       {won || lost ? (
         <div className="card-3d rounded-2xl p-6 text-center space-y-3">
           <div className="text-3xl">{won ? "🏆" : "💀"}</div>
-          <div className="text-white font-bold">{won ? "Boss defeated!" : "You were defeated"}</div>
+          <div className="text-white font-bold">{won ? `${bossName} defeated!` : "You were defeated"}</div>
           <button onClick={() => setRound(r => r + 1)} className="btn-neon text-white font-semibold px-6 py-3 rounded-xl">{won ? "Fight again" : "Try again"}</button>
         </div>
       ) : (
