@@ -1,0 +1,112 @@
+import type { Beat, CourseScript } from "./types";
+
+/* ABE 573 "The Engineer's Oath": teaching scripts per chapter, following the ABE 573 class note order. */
+
+const say = (who: string, text: string): Beat => ({ t: "say", who, text });
+const scene = (s: string): Beat => ({ t: "scene", scene: s });
+
+const script: CourseScript = {
+  characters: {
+    bello: { name: "Engr. Bello", emoji: "👨🏾‍🏫", color: "#8b5cf6", role: "Your mentor" },
+    socrates: { name: "Socrates", emoji: "🧓", color: "#a16207", role: "Philosopher (469-399 BC)" },
+    ngozi: { name: "Mrs Ngozi", emoji: "👩🏾‍💼", color: "#059669", role: "COREN registration officer" },
+    chidi: { name: "Chidi", emoji: "🧑🏾‍🔧", color: "#0ea5e9", role: "Engineering technician" },
+    quack: { name: "Oga Quack", emoji: "🦹", color: "#dc2626", role: "Unregistered 'engineer'" },
+    aisha: { name: "Hon. Aisha", emoji: "👩🏾‍⚖️", color: "#d946ef", role: "Lawmaker" },
+  },
+  scenes: {
+    library: { name: "Ancient library", sky: ["#3f2a14", "#120c06"], ground: "#4a3520", props: ["📜", "🏛️", "🕯️", "📚"] },
+    workshop: { name: "Workshop of inventions", sky: ["#1e3a5f", "#0b1220"], ground: "#3a3f4a", props: ["⚙️", "🔧", "💡", "🛠️"] },
+    coren: { name: "COREN office, Abuja", sky: ["#064e3b", "#0b1410"], ground: "#334155", props: ["🗂️", "🖥️", "🪪", "📜"] },
+    site: { name: "Construction site", sky: ["#7c2d12", "#1c1410"], ground: "#57534e", props: ["🏗️", "🧱", "🚧", "🦺"] },
+    ethics: { name: "Hall of ethics", sky: ["#3b0764", "#0f0a1a"], ground: "#3f3a52", props: ["⚖️", "🏛️", "📜", "🕊️"] },
+    college: { name: "Technical college", sky: ["#0c4a6e", "#0b1220"], ground: "#334155", props: ["🏫", "🔬", "📚", "🧪"] },
+    nation: { name: "Nigeria's infrastructure", sky: ["#14532d", "#0b1410"], ground: "#3f4a3f", props: ["🛣️", "⚡", "🚆", "💧"] },
+  },
+  chapters: [
+    { lesson: 1, scene: "library", beats: [
+      scene("library"),
+      say("bello", "Welcome, young graduate! Your dream is to see your name on the COREN register. But every engineer's journey starts with WISDOM. Let's begin in the ancient library."),
+      say("bello", "First, SOCIETY: a group of people living together, with the same interests, under the same law. Engineers serve society, so we must understand it."),
+      say("bello", "PHILOSOPHY comes from the Greek 'philosophia', which means LOVE OF WISDOM. Your course studies three philosophers: Socrates, Plato and Aristotle."),
+      say("socrates", "Ah, a young engineer! Tell me, do you know everything?"),
+      { t: "choice", who: "socrates", prompt: "How should a wise engineer answer Socrates?", options: ["Yes, I have a degree now", "No. I must recognise my own ignorance and stay humble", "Knowledge doesn't matter, only money", "Only professors need knowledge"], correct: 1, right: "Wise! I taught that you must recognise your ignorance, be humble, and accept that no one is perfect or above mistakes.", wrong: "Hmm. Arrogance profits no one, my friend.", hint: "Socrates valued humility." },
+      say("socrates", "Remember: knowledge is POWER, knowledge is FREEDOM, knowledge is WEALTH. And there is no profit in arrogance."),
+      { t: "blank", prompt: "'Philosophy' comes from the Greek word meaning love of ___.", options: ["wisdom", "money", "machines", "power"], correct: 0, explain: "Philosophia = love of wisdom." },
+      say("bello", "Now SCIENCE, from the Latin 'scientia', meaning KNOWLEDGE. Science builds testable explanations and predictions about the universe, through observation and experiment."),
+      { t: "order", prompt: "Arrange the steps of the scientific method.", items: ["State the problem", "Collect data", "Form a hypothesis", "Test the hypothesis", "Draw conclusions"], explain: "Problem, data, hypothesis, test, conclusion.", hint: "You can't test a hypothesis you haven't formed yet." },
+      say("bello", "Science has three attributes: it EXPLAINS what has been observed, PREDICTS what hasn't been observed yet, and TESTS those explanations with new data."),
+      { t: "sort", prompt: "Natural science or social science?", buckets: ["Natural science", "Social science"], items: [["Physics", 0], ["Economics", 1], ["Biology", 0], ["Sociology", 1], ["Chemistry", 0], ["Commerce", 1]], explain: "Natural sciences study the physical and biological world; social sciences study human behaviour." },
+    ] },
+    { lesson: 2, scene: "workshop", beats: [
+      scene("workshop"),
+      say("bello", "Welcome to the workshop of inventions. Here we turn knowledge into things that change lives."),
+      say("bello", "TECHNOLOGY comes from the Greek 'technologia': 'techne' means art, skill or craft, and 'logia' means the study of. It's the making, use and knowledge of tools, machines and methods to solve problems."),
+      { t: "match", prompt: "Match each word to its origin.", pairs: [["Philosophy", "Love of wisdom"], ["Science (scientia)", "Knowledge"], ["Techne", "Art, skill, craft"], ["Engineering (ingenium)", "Ingenuity, cleverness"]], explain: "Engineering comes from the Latin 'ingenium': ingenuity!" },
+      say("bello", "And ENGINEERING? It's the profession in which knowledge of mathematics and natural science, gained by study, experience and practice, is applied with JUDGEMENT to use the materials and forces of nature ECONOMICALLY for the BENEFIT OF MANKIND."),
+      { t: "choice", who: "bello", prompt: "Which phrase is at the heart of that definition?", options: ["For the benefit of mankind", "For maximum profit", "For military power", "For fame"], correct: 0, right: "Exactly. Engineering exists to serve humanity, economically and with judgement.", wrong: "Who does engineering ultimately serve?", hint: "Think about people." },
+      say("bello", "Engineering work covers research and development, design, construction, manufacture, installation, operation, sales and distribution."),
+      say("bello", "COREN defines engineering practice as any professional or creative work that needs special knowledge of maths, physics and engineering: consultation, invention, research, teaching, planning, operation, maintenance, supervision, design and testing of public utilities, structures and machines."),
+      { t: "sort", prompt: "Is this engineering practice under COREN's definition?", buckets: ["Engineering practice", "Not engineering practice"], items: [["Designing a bridge", 0], ["Supervising construction of a dam", 0], ["Testing a new transformer", 0], ["Selling fabric in the market", 1], ["Teaching engineering at a university", 0]], explain: "Even teaching in a recognized engineering institution counts as engineering practice." },
+    ] },
+    { lesson: 3, scene: "coren", beats: [
+      scene("coren"),
+      say("ngozi", "Welcome to COREN. Many people call themselves engineers, but in Nigeria you are NOT an engineer until your name is on our REGISTER."),
+      say("bello", "First, meet the ENGINEERING FAMILY. It's a pyramid with four cadres: Engineers at the top, then Technologists, Technicians and Craftsmen. Artisans are unclassified."),
+      { t: "order", prompt: "Arrange the engineering family from the top of the pyramid down.", items: ["Engineers", "Engineering Technologists", "Engineering Technicians", "Engineering Craftsmen"], explain: "Each cadre has a defined role, and no member is inferior in a team." },
+      say("bello", "In a healthy organization, there should be FAR more technologists and technicians than engineers. The desirable ratio is 1 ENGINEER : 8 TECHNOLOGISTS : 16 TECHNICIANS."),
+      { t: "calc", prompt: "A firm employs 3 engineers. Using the 1:8:16 ratio, how many technicians should it have?", answer: 48, unit: "technicians", hint: "Multiply the number of engineers by 16.", explain: "3 × 16 = 48 technicians (and 3 × 8 = 24 technologists)." },
+      say("bello", "The NSE suggested 1:6:60 in 1980 (Engineer : Technologist/Technician : Craftsman). But in Nigeria the pyramid is upside down: everyone wants to be an engineer, so universities overflow while technical colleges are empty."),
+      say("ngozi", "To register as an engineer, you need TWO qualifications."),
+      { t: "match", prompt: "Match the requirement.", pairs: [["Academic qualification", "At least a bachelor's degree in engineering from an accredited institution"], ["Pupilage", "About 4 years of practice under a Registered Engineer"], ["Professional exam", "Conducted by COREN or NSE"], ["SITSIE", "A mandatory one-year internship right after graduation, before NYSC"]], explain: "Your registration number will start with 'R'." },
+      { t: "choice", who: "ngozi", prompt: "You graduate next month. What comes first, before NYSC?", options: ["SITSIE internship", "COREN exam", "Pupilage of 10 years", "Nothing at all"], correct: 0, right: "SITSIE, the Supervised Industrial Training Scheme in Engineering: one year of supervised practice.", wrong: "COREN created a scheme just for fresh graduates.", hint: "It's an internship." },
+      say("bello", "One more fact: engineers train about 75% formally and 25% practically; technologists about 60% formally and 40% practically."),
+    ] },
+    { lesson: 4, scene: "site", beats: [
+      scene("site"),
+      say("chidi", "Welcome to the site! I'm Chidi, a technician. People always ask me: 'Are you the engineer?' No. We all have different jobs."),
+      say("bello", "Let's see who does what on this site."),
+      { t: "match", prompt: "Match each cadre to their main role.", pairs: [["Engineer", "Plans, designs, researches and leads the establishment"], ["Technologist", "Technical supervisor; applies proven techniques"], ["Technician", "Operation, maintenance, fault diagnosis; foreman"], ["Craftsman", "Skilled hands-on work"]], explain: "Engineers think in the abstract and link ideas that aren't obviously connected." },
+      say("chidi", "My special job is to BRIDGE THE GAP. I translate the engineer's language into instructions the craftsmen can follow."),
+      { t: "choice", who: "bello", prompt: "Which cadre bridges the gap between craftsmen and professional engineers?", options: ["Technologist", "Technician", "Artisan", "Manager"], correct: 1, right: "The technician, like Chidi. They need more general technical knowledge than craftsmen.", wrong: "Chidi just told you his special job!", hint: "Chidi's cadre." },
+      { t: "sort", prompt: "Which cadre would do this?", buckets: ["Engineer", "Technologist", "Technician"], items: [["Design the building's structure", 0], ["Supervise technicians and craftsmen", 1], ["Diagnose a faulty generator", 2], ["Head the engineering firm", 0], ["Apply proven techniques in a workshop", 1], ["Run day-to-day maintenance", 2]], explain: "Technologists qualify with a degree in engineering technology or an HND; their body is NATE. Technicians qualify with an OND/ND or FTC." },
+      say("quack", "Heh! Why all this grammar? I can do everything: design, build, wire. Cheap price!"),
+      say("bello", "And THAT is the danger of the FUSION OF ROLES. When the cadres blur, unqualified people practise engineering. The result is confusion, diluted standards, and disasters like building collapses."),
+      { t: "choice", who: "bello", prompt: "What is the main concern about the fusion of roles among cadres?", options: ["It saves money", "Role confusion, and engineering practised by unqualified people", "It improves teamwork", "It reduces paperwork"], correct: 1, right: "Right. That leads to accidents and losses.", wrong: "Think about Oga Quack.", hint: "Who ends up doing the engineering?" },
+    ] },
+    { lesson: 5, scene: "ethics", beats: [
+      scene("ethics"),
+      say("bello", "This is the hall of ethics. Codes and standards protect people from injury, give engineers a better working environment, and build public confidence in our profession."),
+      say("bello", "Your duties fall into three groups: duty to your CLIENT, duty to the PUBLIC, and duty to your COLLEAGUES."),
+      { t: "sort", prompt: "Which group of duties is each?", buckets: ["Client", "Public", "Colleagues"], items: [["Work only within your competence", 0], ["Hold public safety paramount", 1], ["Credit a colleague's work", 2], ["Serve your employer faithfully", 0], ["Report a danger to the authorities", 1], ["Support a junior engineer's development", 2]], explain: "Public safety comes first, always." },
+      { t: "choice", who: "bello", prompt: "Your project could compromise public safety, and fixing it will delay delivery. What do you do?", options: ["Ignore it to meet the deadline", "Report it to the appropriate authority or ethics committee", "Quietly resign", "Tell only the contractor"], correct: 1, right: "Correct. Public safety is paramount, even when it's inconvenient.", wrong: "Your first duty is to the public's safety.", hint: "Public safety comes first." },
+      say("bello", "Now the professional bodies. Know them well."),
+      { t: "match", prompt: "Match each body to its role.", pairs: [["COREN", "Legal regulator; keeps the register for all cadres except artisans"], ["NSE", "Nigerian Society of Engineers; exams, institutes like NIMechE"], ["NATE", "Association for engineering technologists"]], explain: "COREN = Council for the Regulation of Engineering in Nigeria." },
+      say("bello", "A little history: the FIRST engineering was MILITARY engineering. Civilians doing non-military works gave rise to CIVIL engineering, and the field later split into many branches for specialization."),
+      { t: "blank", prompt: "The first type of engineering ever practised was ___ engineering.", options: ["military", "civil", "electrical", "biomedical"], correct: 0, explain: "Civil engineering grew out of non-military works." },
+    ] },
+    { lesson: 6, scene: "college", beats: [
+      scene("college"),
+      say("bello", "Why does Nigeria lack qualified engineering personnel? The main reason in your course papers is LACK OF AWARENESS AND GUIDANCE about professional training requirements."),
+      { t: "sort", prompt: "Is this a real challenge for engineering training in Nigeria?", buckets: ["Real challenge", "Not a challenge"], items: [["Outdated equipment and poor funding", 0], ["Too few industrial placements", 0], ["An oversupply of engineers", 1], ["Pupils not knowing technical colleges exist", 0], ["Irregular accreditation of programmes", 0], ["Too much government funding", 1]], explain: "The problem is a SHORTAGE of qualified people, not an oversupply." },
+      say("quack", "Engineer, technician, quack, it's all the same to the customer. I'm cheaper!"),
+      say("bello", "Nigeria has more quacks than registered professionals. Quacks undercut prices, and their failures UNDERMINE PUBLIC CONFIDENCE AND SAFETY."),
+      { t: "choice", who: "bello", prompt: "What's the recommended strategy against quackery?", options: ["Lower licensing standards", "Public awareness about hiring qualified, registered personnel", "Shorter training programmes", "Ignore it"], correct: 1, right: "Educate the public. Reducing licensing rigour would make things worse.", wrong: "Who hires the quacks?", hint: "Customers need to know the difference." },
+      say("bello", "The fixes: balance theory with PRACTICAL skills, keep CURRICULA UP TO DATE with emerging technology, build INDUSTRY-UNIVERSITY PARTNERSHIPS for training, promote TECHNICAL AND VOCATIONAL education, and commit to CONTINUOUS PROFESSIONAL DEVELOPMENT."),
+      { t: "choice", who: "bello", prompt: "How should theory be treated in engineering education?", options: ["Removed entirely", "Balanced with practical skills", "Taught only after graduation", "Made the only focus"], correct: 1, right: "Balance. An engineer in a developing country should use their hands as well as their brain.", wrong: "Extremes don't work.", hint: "Both matter." },
+    ] },
+    { lesson: 7, scene: "nation", beats: [
+      scene("nation"),
+      say("aisha", "Engineer, Nigeria faces insecurity, a weak private sector, poor infrastructure, corruption and climate change. What can engineering do?"),
+      say("bello", "Engineering's chief responsibility is MANAGING THE INFRASTRUCTURE that every other sector depends on."),
+      { t: "sort", prompt: "Which of these are infrastructure that engineers manage?", buckets: ["Engineering infrastructure", "Not infrastructure"], items: [["Roads, rail and ports", 0], ["Power generation and distribution", 0], ["Water and sewage systems", 0], ["Dams and irrigation", 0], ["Fashion trends", 1], ["ICT networks", 0]], explain: "When infrastructure fails, health, education, trade and security all suffer." },
+      say("bello", "Hassan and Bitrus (2020) give a way forward: human resource development, declaring a state of emergency on engineering education, innovation through PUBLIC-PRIVATE PARTNERSHIPS, good governance, fighting corruption, and incentives."),
+      { t: "match", prompt: "Match each idea.", pairs: [["PPP", "Public-Private Partnership for infrastructure"], ["EFCC and ICPC", "Anti-corruption agencies"], ["Good governance", "Accountable, transparent, follows the rule of law"], ["Incentives", "Scholarships and good pay to attract youth, especially women"]], explain: "Citizens already pay for generators and boreholes, so they're willing to pay for better services through PPPs." },
+      { t: "choice", who: "aisha", prompt: "For sustainable projects, when should environmental impact be considered?", options: ["After completion", "From the project's inception", "Only if the law forces us", "Never"], correct: 1, right: "From day one, balancing environmental, social and economic impact.", wrong: "Sustainability must be designed in.", hint: "Start as you mean to go on." },
+      say("aisha", "Engineers should even contest political office, the paper says. Will you join us someday?"),
+      say("bello", "You've walked the whole journey: wisdom, science, the engineering family, registration, ethics and nation-building. Only one thing stands in your way now: the Quack Syndicate. Defeat them!"),
+    ] },
+  ],
+};
+
+export default script;
